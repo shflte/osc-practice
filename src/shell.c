@@ -4,6 +4,8 @@
 #include "reboot.h"
 #include "utils.h"
 #include "config.h"
+#include <stddef.h>
+
 
 typedef struct {
 	const char *command;
@@ -91,7 +93,7 @@ void reboot_device()
 
 void parse_command(char *buffer)
 {
-	utils_trim_newline(buffer);
+	trim_newline(buffer);
 	uart_send_f("\r");
 
 	if (buffer[0] == '\0') {
@@ -99,7 +101,7 @@ void parse_command(char *buffer)
 	}
 
 	for (size_t i = 0; i < COMMAND_COUNT; i++) {
-		if (utils_str_compare(buffer, command_list[i].command) == 0) {
+		if (strcmp(buffer, command_list[i].command) == 0) {
 			command_list[i].handler();
 			return;
 		}
@@ -113,10 +115,8 @@ void shell()
 	char buffer[SHELL_BUFFER_SIZE];
 	int c;
 	while (1) {
-		// uart_send_f("$ ");
-		// read_command(buffer);
-		// parse_command(buffer);
-		c = uart_recv();
-		uart_send(c);
+		uart_send_f("$ ");
+		read_command(buffer);
+		parse_command(buffer);
 	}
 }

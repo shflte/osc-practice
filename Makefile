@@ -9,7 +9,7 @@ RM			= rm -f
 # Flags
 CFLAGS		= -Iinclude -fno-stack-protector
 LDFLAGS		= -T src/linker.ld
-QEMUFLAGS	= -M raspi3b -kernel $(TARGET).img -serial stdio -nographic -monitor none
+QEMUFLAGS	= -M raspi3b -kernel $(TARGET).img -display none -S -s
 
 # Files & directories
 TARGET		= kernel8

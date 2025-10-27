@@ -111,9 +111,12 @@ void parse_command(char *buffer)
 void shell()
 {
 	char buffer[SHELL_BUFFER_SIZE];
+	int c;
 	while (1) {
-		uart_send_f("$ ");
-		read_command(buffer);
-		parse_command(buffer);
+		// uart_send_f("$ ");
+		// read_command(buffer);
+		// parse_command(buffer);
+		c = uart_recv();
+		uart_send(c);
 	}
 }

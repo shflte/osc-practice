@@ -1,5 +1,5 @@
-#ifndef _PERIPHERAL_MINI_UART_H
-#define _PERIPHERAL_MINI_UART_H
+#ifndef _PERIPHERAL_UART_H
+#define _PERIPHERAL_UART_H
 
 #include "peripherals/base.h"
 

@@ -32,6 +32,7 @@ void read_command(char *buffer)
 
 	while (1) {
 		input = uart_recv();
+		input = input == '\r' ? '\n' : input;
 		uart_send_f("%c", input);
 		if (input == '\n') {
 			break;
@@ -113,7 +114,6 @@ void parse_command(char *buffer)
 void shell()
 {
 	char buffer[SHELL_BUFFER_SIZE];
-	int c;
 	while (1) {
 		uart_send_f("$ ");
 		read_command(buffer);

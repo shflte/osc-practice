@@ -1,3 +1,7 @@
+build/
+CMakeFiles/
+cmake_install.cmake
+Makefile
 test*
 tmp*
 *.img

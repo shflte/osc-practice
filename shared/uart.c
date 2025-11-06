@@ -32,6 +32,7 @@ void uart_init(void)
 	put32(AUX_MU_MCR_REG, 0);				// Set RTS line to be always high
 	put32(AUX_MU_BAUD_REG, 270);			// Set baud rate to 115200
 
+	put32(AUX_MU_IIR_REG, 6);
 	put32(AUX_MU_CNTL_REG, 3);				// Finally, enable transmitter and receiver
 }
 
@@ -45,12 +46,17 @@ void uart_send(char c)
 
 char uart_recv(void)
 {
-	char received_char;
 	while(1) {
 		if (get32(AUX_MU_LSR_REG) & 0x01) break;
 	}
-	received_char = get32(AUX_MU_IO_REG) & 0xFF;
-	return received_char == '\r' ? '\n' : received_char;
+	return (get32(AUX_MU_IO_REG) & 0xFF);
+}
+
+void uart_flush_rx(void)
+{
+    while (get32(AUX_MU_LSR_REG) & 0x01) {
+        (void)get32(AUX_MU_IO_REG);
+    }
 }
 
 static void uart_send_string(const char* str)

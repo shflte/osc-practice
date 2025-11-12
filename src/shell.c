@@ -1,11 +1,11 @@
 #include "shell.h"
 #include "uart.h"
 #include "mailbox.h"
+#include "cpio.h"
 #include "reboot.h"
 #include "utils.h"
 #include "config.h"
 #include <stddef.h>
-
 
 typedef struct {
 	const char *command;
@@ -16,45 +16,30 @@ typedef struct {
 static void help();
 static void hello();
 static void info();
+static void ls();
+static void cat();
 static void reboot_device();
 
 static const Command command_list[] = {
 	{"help", "Print this help menu", help},
 	{"hello", "Print Hello World!", hello},
 	{"info", "Show mailbox hardware info", info},
+	{"ls", "List files in CPIO archive", ls},
+	{"cat", "Print file content", cat},
 	{"reboot", "Reboot the device", reboot_device}
 };
-
-void read_command(char *buffer)
-{
-	size_t index = 0;
-	char input;
-
-	while (1) {
-		input = uart_recv();
-		input = input == '\r' ? '\n' : input;
-		uart_send_f("%c", input);
-		if (input == '\n') {
-			break;
-		}
-		if (index < SHELL_BUFFER_SIZE - 1) {
-			buffer[index++] = input;
-		}
-	}
-	buffer[index] = '\0';
-}
+static const int command_count = sizeof(command_list) / sizeof(Command);
 
 void help()
 {
-	uart_send_f("Available commands:\r\n");
-	for (size_t i = 0; i < COMMAND_COUNT; i++) {
-		uart_send_f("  %s : %s\r\n", command_list[i].command, command_list[i].description);
+	for (int i = 0; i < command_count; i++) {
+		uart_send_f("  %s : %s\n", command_list[i].command, command_list[i].description);
 	}
 }
 
 void hello()
 {
-	uart_send_f("Hello World!\r\n");
+	uart_send_f("Hello World!\n");
 }
 
 void info()
@@ -65,50 +50,56 @@ void info()
 	unsigned int rate;
 
 	if (get_board_revision(&board_revision) != 0) {
-		uart_send_f("Error: Unable to retrieve board revision.\r\n");
+		uart_send_f("Error: Unable to retrieve board revision.\n");
 		return;
 	}
 
 	if (get_arm_memory(&base_address, &size) != 0) {
-		uart_send_f("Error: Unable to retrieve ARM memory information.\r\n");
+		uart_send_f("Error: Unable to retrieve ARM memory information.\n");
 		return;
 	}
 
 	if (get_clock_rate(&rate, UART_CLOCK_ID) != 0) {
-		uart_send_f("Error: Unable to retrieve UART clock rate.\r\n");
+		uart_send_f("Error: Unable to retrieve UART clock rate.\n");
 		return;
 	}
 
-	uart_send_f("Hardware Information:\r\n");
-	uart_send_f("  Board Revision: 0x%X\r\n", board_revision);
-	uart_send_f("  ARM Memory Base: 0x%X\r\n", base_address);
-	uart_send_f("  ARM Memory Size: 0x%X\r\n", size);
-	uart_send_f("  UART Clock Rate: %d Hz\r\n", rate);
+	uart_send_f("Hardware Information:\n");
+	uart_send_f("  Board Revision: 0x%X\n", board_revision);
+	uart_send_f("  ARM Memory Base: 0x%X\n", base_address);
+	uart_send_f("  ARM Memory Size: 0x%X\n", size);
+	uart_send_f("  UART Clock Rate: %d Hz\n", rate);
+}
+
+void ls() {
+	cpio_ls();
+}
+
+void cat() {
+	char buffer[FILENAME_BUFFER_SIZE];
+	char* file = 0;
+	unsigned int size = 0;
+
+	uart_send_f("Filename: ");
+	uart_getline(buffer, FILENAME_BUFFER_SIZE);
+	buffer[strlen(buffer) - 1] = '\0';
+
+	file = cpio_get_file(buffer, &size);
+	if (file == 0) {
+		uart_send_f("File not found\n");
+		return;
+	}
+
+	for (unsigned int i = 0; i < size; i++) {
+		uart_send(file[i]);
+	}
+	uart_send_f("\n");
 }
 
 void reboot_device()
 {
-	uart_send_f("Rebooting...\r\n");
+	uart_send_f("Rebooting...\n");
 	reset(1000);
-}
-
-void parse_command(char *buffer)
-{
-	trim_newline(buffer);
-	uart_send_f("\r");
-
-	if (buffer[0] == '\0') {
-		return;
-	}
-
-	for (size_t i = 0; i < COMMAND_COUNT; i++) {
-		if (strcmp(buffer, command_list[i].command) == 0) {
-			command_list[i].handler();
-			return;
-		}
-	}
-
-	uart_send_f("Command '%s' not found. Type 'help' for available commands.\r\n", buffer);
 }
 
 void shell()
@@ -116,7 +107,22 @@ void shell()
 	char buffer[SHELL_BUFFER_SIZE];
 	while (1) {
 		uart_send_f("$ ");
-		read_command(buffer);
-		parse_command(buffer);
+		uart_getline(buffer, SHELL_BUFFER_SIZE);
+
+		if (buffer[0] == '\0') {
+			return;
+		}
+
+		buffer[strlen(buffer) - 1] = '\0';
+		int command_found = 0;
+		for (int i = 0; i < command_count; i++) {
+			if (strcmp(buffer, command_list[i].command) == 0) {
+				command_list[i].handler();
+				command_found = 1;
+				break;
+			}
+		}
+
+		if (!command_found) uart_send_f("Command '%s' not found. Type 'help' for available commands.\n", buffer);
 	}
 }

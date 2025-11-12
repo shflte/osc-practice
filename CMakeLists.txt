@@ -5,6 +5,7 @@ set(SHARED_SOURCES
     shared/hw_utils.S
     shared/mm.S
     shared/uart.c
+    shared/utils.c
 )
 
 # UART bootloader
@@ -39,9 +40,9 @@ add_executable(kernel8
     src/init.S
     src/main.c
     src/shell.c
-    src/utils.c
     src/mailbox.c
     src/reboot.c
+    src/cpio.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")

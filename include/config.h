@@ -3,7 +3,7 @@
 
 #define SHELL_BUFFER_SIZE		256u
 #define UART_BUFFER_SIZE		256u
+#define FILENAME_BUFFER_SIZE    256u
 #define COMMAND_LENGTH_MAX		20u
-#define COMMAND_COUNT			4u
 
 #endif

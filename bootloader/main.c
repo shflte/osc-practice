@@ -15,7 +15,7 @@ void bootloader_main(void)
     char recved;
     for (int i = 0; i < 4; i++) {
         recved = uart_recv();
-        if (recved >= 0x80) {
+        if (recved == 0xFC || recved == 0xFE) {
             i--;
             continue;
         }

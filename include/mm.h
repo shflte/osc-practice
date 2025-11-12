@@ -10,9 +10,16 @@
 
 #define LOW_MEMORY				(2 * SECTION_SIZE)
 
+#define SIMPLE_MALLOC_BASE      0x10000000u
+#define SIMPLE_MALLOC_SIZE      (1 * SECTION_SIZE)
+#define SIMPLE_MALLOC_END       (SIMPLE_MALLOC_BASE + SIMPLE_MALLOC_SIZE)
+
 #ifndef __ASSEMBLER__
 
+#include <stddef.h>
+
 void memzero(unsigned long src, unsigned long n);
+void* mini_malloc(size_t size);
 
 #endif
 

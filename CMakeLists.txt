@@ -43,6 +43,7 @@ add_executable(kernel8
     src/mailbox.c
     src/reboot.c
     src/cpio.c
+    src/mm.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")

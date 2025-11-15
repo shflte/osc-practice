@@ -6,7 +6,7 @@
 const char* READY_MSG = "[Bootloader] UART initialized\n";
 const char* OK_MSG = "[Bootloader] Received length\n";
 
-void bootloader_main(void)
+void bootloader_main(void* dtb_base)
 {
     uart_init();
     uart_send_f(READY_MSG);
@@ -30,6 +30,6 @@ void bootloader_main(void)
     }
     uart_send_f("[Bootloader] Done transmission.\n");
 
-    void (*kernel_entry_point)(void) = (void*)KERNEL_ADDRESS;
-    kernel_entry_point();
+    void (*kernel_entry_point)(void*) = (void*)KERNEL_ADDRESS;
+    kernel_entry_point(dtb_base);
 }

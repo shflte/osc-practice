@@ -1,8 +1,9 @@
 #ifndef _SHELL_H
 #define _SHELL_H
 
+#define SHELL_BUFFER_SIZE       256u
+#define FILENAME_BUFFER_SIZE    256u
+
 void shell();
-void read_command(char *str);
-void parse_command(char *str);
 
 #endif

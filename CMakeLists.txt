@@ -44,6 +44,7 @@ add_executable(kernel8
     src/reboot.c
     src/cpio.c
     src/mm.c
+    src/fdt.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")
@@ -64,7 +65,9 @@ add_custom_command(
 add_custom_target(qemu
     COMMAND qemu-system-aarch64
         -M raspi3b
-        -kernel $<TARGET_FILE:kernel8>
+        -kernel kernel8.img
+        -initrd initramfs.cpio
+        -dtb bcm2710-rpi-3-b-plus.dtb
         -display none
         -serial tcp::4321,server,nowait
         -s -S

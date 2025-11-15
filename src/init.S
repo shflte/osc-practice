@@ -4,6 +4,8 @@
 
 .globl _start
 _start:
+	mov		x19, x0
+
 	mrs		x0, mpidr_el1
 	and		x0, x0, #0xFF
 	cbz		x0, master
@@ -19,4 +21,5 @@ master:
 	bl		memzero
 
 	mov		sp, #LOW_MEMORY
+	mov		x0, x19
 	bl		kernel_main

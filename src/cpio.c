@@ -1,9 +1,10 @@
 #include <stddef.h>
 #include "cpio.h"
-#include "uart.h"
 #include "utils.h"
+#include "fdt.h"
 
-#define round_4(number) ((number + 3) / 4 * 4)
+static int g_in_node = 0;
+static char* g_cpio_base = 0;
 
 static unsigned int str2size(const char* str) {
     unsigned int size_res = 0;
@@ -17,6 +18,31 @@ static unsigned int str2size(const char* str) {
         size_res += cur;
     }
     return size_res;
+}
+
+void cpio_fdt_probe(uint32_t token,
+					const char* name,
+					const void* value,
+					unsigned int value_len) {
+    switch(token) {
+        case FDT_BEGIN_NODE:
+            if (strcmp(name, "chosen") == 0) g_in_node = 1;
+            break;
+        case FDT_END_NODE:
+            if (strcmp(name, "chosen") == 0) g_in_node = 0;
+            break;
+        case FDT_PROP:
+            if (g_in_node && strcmp(name, "linux,initrd-start") == 0) {
+                if (value_len == 4) {
+                    g_cpio_base = (char*)(uintptr_t)b2l_32(*((uint32_t*)value));
+                } else if (value_len == 8) {
+                    g_cpio_base = (char*)(uintptr_t)b2l_64(*((uint64_t*)value));
+                }
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void cpio_ls(void) {

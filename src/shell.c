@@ -1,10 +1,8 @@
 #include "shell.h"
-#include "uart.h"
 #include "mailbox.h"
 #include "cpio.h"
 #include "reboot.h"
 #include "utils.h"
-#include "config.h"
 #include <stddef.h>
 
 typedef struct {
@@ -91,7 +89,7 @@ void cat() {
 	}
 
 	for (unsigned int i = 0; i < size; i++) {
-		uart_send(file[i]);
+		uart_send_f("%c", file[i]);
 	}
 	uart_send_f("\n");
 }

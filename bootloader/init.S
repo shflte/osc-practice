@@ -3,6 +3,8 @@
 .section ".text.relo"
 .globl _start
 _start:
+	mov		x19, x0
+
 	ldr		x10, =bl_size
 	adr		x11, _start
 	ldr		x12, =bl_begin
@@ -21,19 +23,20 @@ done_loop:
 
 .section ".text.boot"
 check_cores:
-	mrs		x0, mpidr_el1
-	and		x0, x0, #0xFF
-	cbz		x0, master
+	mrs		x10, mpidr_el1
+	and		x10, x10, #0xFF
+	cbz		x10, master
 	b		proc_hang
 
 proc_hang:
 	b		proc_hang
 
 master:
-	adr		x0, bss_begin
-	adr		x1, bss_end
-	sub		x1, x1, x0
+	adr		x10, bss_begin
+	adr		x11, bss_end
+	sub		x11, x11, x10
 	bl		memzero
 
 	mov		sp, #LOW_MEMORY
+	mov		x0, x19
 	bl		bootloader_main

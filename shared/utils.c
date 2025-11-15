@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "config.h"
+#include "utils.h"
 #include <stddef.h>
 #include <stdarg.h>
 
@@ -249,4 +249,26 @@ char* strcpy(char* dest, const char* src) {
 	dest[i] = '\0';
 
 	return dest;
+}
+
+uint32_t b2l_32(uint32_t num) {
+    uint32_t res = 0;
+    res = ((num >> 24) & 0x000000ff) |
+          ((num >> 8)  & 0x0000ff00) |
+          ((num << 8)  & 0x00ff0000) |
+          ((num << 24) & 0xff000000);
+    return res;
+}
+
+uint64_t b2l_64(uint64_t num) {
+    uint64_t res = 0;
+    res = ((num >> 56) & 0x00000000000000ffULL) |
+          ((num >> 40) & 0x000000000000ff00ULL) |
+          ((num >> 24) & 0x0000000000ff0000ULL) |
+          ((num >> 8)  & 0x00000000ff000000ULL) |
+          ((num << 8)  & 0x000000ff00000000ULL) |
+          ((num << 24) & 0x0000ff0000000000ULL) |
+          ((num << 40) & 0x00ff000000000000ULL) |
+          ((num << 56) & 0xff00000000000000ULL);
+    return res;
 }

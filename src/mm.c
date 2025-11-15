@@ -1,6 +1,5 @@
 #include "mm.h"
-
-#define round_8(number) ((number + 7) / 8 * 8)
+#include "utils.h"
 
 static void* free_ptr = (void*)SIMPLE_MALLOC_BASE;
 

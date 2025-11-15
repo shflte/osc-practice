@@ -3,6 +3,8 @@
 
 #define CPIO_BASE 0x20000000u
 
+#include <stdint.h>
+
 typedef struct cpio_newc_header {
 	char c_magic[6];
 	char c_ino[8];
@@ -20,6 +22,10 @@ typedef struct cpio_newc_header {
 	char c_check[8];
 } cpio_header_t;
 
+void cpio_fdt_probe(uint32_t token,
+					const char* name,
+					const void* value,
+					unsigned int value_len);
 void cpio_ls(void);
 char* cpio_get_file(const char* filename, unsigned int* size);
 

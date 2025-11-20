@@ -45,6 +45,8 @@ add_executable(kernel8
     src/cpio.c
     src/mm.c
     src/fdt.c
+    src/entry.S
+    src/exception.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")
@@ -62,13 +64,28 @@ add_custom_command(
     COMMENT "Generating ${KERNEL_TARGET}"
 )
 
-add_custom_target(qemu
+add_custom_target(run
     COMMAND qemu-system-aarch64
         -M raspi3b
         -kernel kernel8.img
         -initrd initramfs.cpio
         -dtb bcm2710-rpi-3-b-plus.dtb
         -display none
+        -serial null
+        -serial stdio
+
+    DEPENDS kernel8
+    COMMENT "Running QEMU for kernel..."
+)
+
+add_custom_target(debug
+    COMMAND qemu-system-aarch64
+        -M raspi3b
+        -kernel kernel8.img
+        -initrd initramfs.cpio
+        -dtb bcm2710-rpi-3-b-plus.dtb
+        -display none
+        -serial null
         -serial tcp::4321,server,nowait
         -s -S
 

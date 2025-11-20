@@ -16,6 +16,7 @@ static void hello();
 static void info();
 static void ls();
 static void cat();
+static void user_program();
 static void reboot_device();
 
 static const Command command_list[] = {
@@ -24,6 +25,7 @@ static const Command command_list[] = {
 	{"info", "Show mailbox hardware info", info},
 	{"ls", "List files in CPIO archive", ls},
 	{"cat", "Print file content", cat},
+	{"user_program", "Execute user program to test exception handler", user_program},
 	{"reboot", "Reboot the device", reboot_device}
 };
 static const int command_count = sizeof(command_list) / sizeof(Command);
@@ -92,6 +94,22 @@ void cat() {
 		uart_send_f("%c", file[i]);
 	}
 	uart_send_f("\n");
+}
+
+void user_program() {
+	unsigned char user_bin[] = {
+		0x00, 0x00, 0x80, 0xd2, 0x00, 0x04, 0x00, 0x91, 0x01, 0x00, 0x00, 0xd4,
+		0x1f, 0x14, 0x00, 0xf1, 0xab, 0xff, 0xff, 0x54, 0x00, 0x00, 0x00, 0x14
+	};
+	unsigned int user_bin_len = 24;
+
+	void* load_addr = (void*)0x20000;
+	memcpy(load_addr, user_bin, user_bin_len);
+
+	asm volatile("msr spsr_el1, %0" :: "r"(0x3c0));
+    asm volatile("msr elr_el1, %0" :: "r"(load_addr));
+    asm volatile("msr sp_el0, %0" :: "r"(0x10000));
+    asm volatile("eret");
 }
 
 void reboot_device()

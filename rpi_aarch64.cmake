@@ -8,7 +8,7 @@ set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_LINKER ${TOOLCHAIN_PREFIX}ld)
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 
-set(CMAKE_C_FLAGS "-ffreestanding -nostdlib -nostartfiles -fno-stack-protector -Wall -Wextra")
+set(CMAKE_C_FLAGS "-ffreestanding -nostdlib -nostartfiles -fno-stack-protector -mgeneral-regs-only -Wall -Wextra")
 set(CMAKE_ASM_FLAGS "")
 
 set(CMAKE_C_FLAGS_DEBUG "-O0 -g")

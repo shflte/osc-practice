@@ -251,6 +251,13 @@ char* strcpy(char* dest, const char* src) {
 	return dest;
 }
 
+void* memcpy(void* dest, const void* src, size_t n) {
+	for (size_t i = 0; i < n; i++) {
+		((char*)dest)[i] = ((const char*)src)[i];
+	}
+	return dest;
+}
+
 uint32_t b2l_32(uint32_t num) {
     uint32_t res = 0;
     res = ((num >> 24) & 0x000000ff) |

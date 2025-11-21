@@ -1,16 +1,12 @@
 #include "peripherals/power_management.h"
-
-void set(long addr, unsigned int value) {
-	volatile unsigned int* point = (unsigned int*)addr;
-	*point = value;
-}
+#include "utils.h"
 
 void reset(int tick) {
-	set(PM_RSTC, PM_PASSWORD | 0x20);
-	set(PM_WDOG, PM_PASSWORD | tick);
+	put32(PM_RSTC, PASSWORD | 0x20);
+	put32(PM_WDOG, PASSWORD | tick);
 }
 
 void cancel_reset() {
-	set(PM_RSTC, PM_PASSWORD | 0);
-	set(PM_WDOG, PM_PASSWORD | 0);
+	put32(PM_RSTC, PASSWORD | 0);
+	put32(PM_WDOG, PASSWORD | 0);
 }

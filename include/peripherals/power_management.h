@@ -1,8 +1,12 @@
 #ifndef _PERIPHERAL_POWER_MANAGEMENT_H
 #define _PERIPHERAL_POWER_MANAGEMENT_H
 
-#define PM_PASSWORD			0x5A000000
-#define PM_RSTC				0x3F10001C
-#define PM_WDOG				0x3F100024
+#include "peripherals/base.h"
+
+#define PM_BASE				MMIO_BASE + 0x00100000
+#define PM_RSTC				((volatile unsigned int *)(PM_BASE + 0x1C))
+#define PM_WDOG				((volatile unsigned int *)(PM_BASE + 0x24))
+
+#define PASSWORD			0x5A000000
 
 #endif

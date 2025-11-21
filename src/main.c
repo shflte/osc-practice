@@ -2,6 +2,7 @@
 #include "uart.h"
 #include "cpio.h"
 #include "shell.h"
+#include "timer.h"
 
 void kernel_main(void* dtb_base)
 {
@@ -10,6 +11,8 @@ void kernel_main(void* dtb_base)
     fdt_traverse(dtb_base);
 
     uart_init();
+
+    timer_init();
 
     shell();
 }

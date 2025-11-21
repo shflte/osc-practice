@@ -106,7 +106,7 @@ void user_program() {
 	void* load_addr = (void*)0x20000;
 	memcpy(load_addr, user_bin, user_bin_len);
 
-	asm volatile("msr spsr_el1, %0" :: "r"(0x3c0));
+	asm volatile("msr spsr_el1, %0" :: "r"(0x0));
     asm volatile("msr elr_el1, %0" :: "r"(load_addr));
     asm volatile("msr sp_el0, %0" :: "r"(0x10000));
     asm volatile("eret");

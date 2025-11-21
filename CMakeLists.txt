@@ -47,6 +47,7 @@ add_executable(kernel8
     src/fdt.c
     src/entry.S
     src/exception.c
+    src/timer.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")

@@ -1,4 +1,5 @@
 #include "exception.h"
+#include "timer.h"
 #include "utils.h"
 
 void el1_sync_router(trap_frame_t* regs) {
@@ -24,5 +25,13 @@ void el0_sync_router(trap_frame_t* regs) {
 }
 
 void el0_irq_router(trap_frame_t* regs) {
+    unsigned long current_time, freq;
 
+    asm volatile("mrs %0, cntpct_el0" : "=r"(current_time));
+    asm volatile("mrs %0, cntfrq_el0" : "=r"(freq));
+
+    uart_send_f("Timer interrupt!\n");
+    uart_send_f("%d seconds after booting.\n", current_time / freq);
+
+    timer_clear();
 }

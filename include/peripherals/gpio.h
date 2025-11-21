@@ -3,10 +3,11 @@
 
 #include "peripherals/base.h"
 
-#define GPFSEL1				((volatile unsigned int *)(MMIO_BASE+0x00200004))
-#define GPSET0				((volatile unsigned int *)(MMIO_BASE+0x0020001C))
-#define GPCLR0				((volatile unsigned int *)(MMIO_BASE+0x00200028))
-#define GPPUD				((volatile unsigned int *)(MMIO_BASE+0x00200094))
-#define GPPUDCLK0			((volatile unsigned int *)(MMIO_BASE+0x00200098))
+#define GPIO_BASE           MMIO_BASE + 0x00200000
+#define GPFSEL1				((volatile unsigned int *)(GPIO_BASE + 0x04))
+#define GPSET0				((volatile unsigned int *)(GPIO_BASE + 0x1C))
+#define GPCLR0				((volatile unsigned int *)(GPIO_BASE + 0x28))
+#define GPPUD				((volatile unsigned int *)(GPIO_BASE + 0x94))
+#define GPPUDCLK0			((volatile unsigned int *)(GPIO_BASE + 0x98))
 
 #endif

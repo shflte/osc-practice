@@ -18,6 +18,9 @@ def main():
     kernel_size = len(kernel_data)
     print(f"Loaded kernel '{kernel_img_path}': {kernel_size} bytes.")
 
+    local_checksum = sum(kernel_data) & 0xFFFFFFFF
+    print(f"Kernel Checksum: {hex(local_checksum)}")
+
     with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=10) as tty:
         print(f"Opened {SERIAL_PORT} at {BAUD_RATE} bps.")
 
@@ -32,8 +35,10 @@ def main():
         print("RPi acknowledged size. Sending kernel data...")
         for i in range(kernel_size):
             tty.write(kernel_data[i:i+1])
-            time.sleep(0.001)
-            tty.read_until(b".")
+
+        time.sleep(1)
+        done_msg = tty.read_until(b"\r\n")
+        print(f"Received from RPi: {done_msg.decode().strip()}")
 
 if __name__ == "__main__":
     main()

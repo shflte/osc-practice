@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(RPI_OS_BOOT C ASM)
 
-set(SHARED_SOURCES
-    shared/hw_utils.S
-    shared/mm.S
-    shared/uart.c
-    shared/utils.c
-)
-
 # UART bootloader
 set(BL_TARGET bootloader.img)
 
-add_executable(bootloader
-    ${SHARED_SOURCES}
-    bootloader/main.c
+add_executable(bootloader EXCLUDE_FROM_ALL
+    bootloader/hw_utils.S
+    bootloader/mm.S
+    bootloader/uart.c
+    bootloader/utils.c
     bootloader/init.S
+    bootloader/main.c
 )
 
 set_target_properties(bootloader PROPERTIES SUFFIX ".elf")
@@ -36,7 +32,10 @@ add_custom_command(
 set(KERNEL_TARGET kernel8.img)
 
 add_executable(kernel8
-    ${SHARED_SOURCES}
+    src/hw_utils.S
+    src/mm.S
+    src/uart.c
+    src/utils.c
     src/init.S
     src/main.c
     src/shell.c

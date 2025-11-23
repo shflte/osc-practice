@@ -17,6 +17,7 @@ static void info();
 static void ls();
 static void cat();
 static void user_program();
+static void timer();
 static void reboot_device();
 
 static const Command command_list[] = {
@@ -26,6 +27,7 @@ static const Command command_list[] = {
 	{"ls", "List files in CPIO archive", ls},
 	{"cat", "Print file content", cat},
 	{"user_program", "Execute user program to test exception handler", user_program},
+	{"timer", "Test timer interrupts", timer},
 	{"reboot", "Reboot the device", reboot_device}
 };
 static const int command_count = sizeof(command_list) / sizeof(Command);
@@ -110,6 +112,13 @@ void user_program() {
     asm volatile("msr elr_el1, %0" :: "r"(load_addr));
     asm volatile("msr sp_el0, %0" :: "r"(0x10000));
     asm volatile("eret");
+}
+
+void timer() {
+	uart_send_f("Press 'q' to exit\n");
+	timer_enable();
+	while (uart_recv() != 'q') { ; }
+	timer_disable();
 }
 
 void reboot_device()

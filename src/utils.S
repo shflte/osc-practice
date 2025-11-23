@@ -13,3 +13,13 @@ delay:
 	subs x0, x0, #1
 	bne delay
 	ret
+
+.global enable_cpu_irq
+enable_cpu_irq:
+	msr daifclr, #2
+	ret
+
+.global disable_cpu_irq
+disable_cpu_irq:
+	msr daifset, #2
+	ret

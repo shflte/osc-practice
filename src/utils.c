@@ -166,7 +166,7 @@ static int format_string(char *buffer, int buffer_size, const char *fmt, __built
 
 void uart_send_f(const char *fmt, ...)
 {
-	char buffer[UART_BUFFER_SIZE];
+	char buffer[SEND_BUFFER_SIZE];
 	__builtin_va_list args;
 
 	__builtin_va_start(args, fmt);
@@ -278,4 +278,31 @@ uint64_t b2l_64(uint64_t num) {
           ((num << 40) & 0x00ff000000000000ULL) |
           ((num << 56) & 0xff00000000000000ULL);
     return res;
+}
+
+void rb_init(ringbuffer_t* rb) {
+	rb->head = 0;
+	rb->tail = 0;
+}
+
+int rb_push(ringbuffer_t* rb, char c) {
+	if (rb_full(rb)) return -1;
+	rb->buffer[rb->head] = c;
+	rb->head = (rb->head + 1) & (RING_BUFFER_SIZE - 1);
+	return 0;
+}
+
+int rb_pop(ringbuffer_t* rb, char* c) {
+	if (rb_empty(rb)) return -1;
+	*c = rb->buffer[rb->tail];
+	rb->tail = (rb->tail + 1) & (RING_BUFFER_SIZE - 1);
+	return 0;
+}
+
+int rb_full(ringbuffer_t* rb) {
+	return ((rb->head + 1) & (RING_BUFFER_SIZE - 1)) == (rb->tail);
+}
+
+int rb_empty(ringbuffer_t* rb) {
+	return rb->head == rb->tail;
 }

@@ -32,7 +32,7 @@ add_custom_command(
 set(KERNEL_TARGET kernel8.img)
 
 add_executable(kernel8
-    src/hw_utils.S
+    src/utils.S
     src/mm.S
     src/uart.c
     src/utils.c
@@ -47,6 +47,7 @@ add_executable(kernel8
     src/entry.S
     src/exception.c
     src/timer.c
+    src/irq.c
 )
 
 set_target_properties(kernel8 PROPERTIES SUFFIX ".elf")

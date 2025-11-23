@@ -166,7 +166,7 @@ static int format_string(char *buffer, int buffer_size, const char *fmt, __built
 
 void uart_send_f(const char *fmt, ...)
 {
-	char buffer[UART_BUFFER_SIZE];
+	char buffer[SEND_BUFFER_SIZE];
 	__builtin_va_list args;
 
 	__builtin_va_start(args, fmt);

@@ -89,7 +89,7 @@ el1_sync_handler:
 el1_irq_handler:
     save_all
     mov x0, sp
-    bl  el1_irq_router
+    bl  irq_router
     load_all
     eret
 
@@ -103,7 +103,7 @@ el0_sync_handler:
 el0_irq_handler:
     save_all
     mov x0, sp
-    bl  el0_irq_router
+    bl  irq_router
     load_all
     eret
 

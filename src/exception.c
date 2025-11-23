@@ -1,14 +1,14 @@
+#include "peripherals/irq.h"
+#include "peripherals/timer.h"
 #include "exception.h"
+#include "irq.h"
 #include "timer.h"
+#include "uart.h"
 #include "utils.h"
 
 void el1_sync_router(trap_frame_t* regs) {
     unsigned long esr;
     asm volatile("mrs %0, esr_el1" : "=r"(esr));
-}
-
-void el1_irq_router(trap_frame_t* regs) {
-
 }
 
 void el0_sync_router(trap_frame_t* regs) {
@@ -24,14 +24,15 @@ void el0_sync_router(trap_frame_t* regs) {
     uart_send_f("ESR_EL1:  0x%x\n", esr);
 }
 
-void el0_irq_router(trap_frame_t* regs) {
-    unsigned long current_time, freq;
+void irq_router(trap_frame_t* regs) {
+    unsigned long core_irq, irq_pend1;
 
-    asm volatile("mrs %0, cntpct_el0" : "=r"(current_time));
-    asm volatile("mrs %0, cntfrq_el0" : "=r"(freq));
+    core_irq = get32(CORE0_INTERRUPT_SOURCE);
+    irq_pend1 = get32(IRQ_PENDING_1);
 
-    uart_send_f("Timer interrupt!\n");
-    uart_send_f("%d seconds after booting.\n", current_time / freq);
-
-    timer_clear();
+    if (core_irq & (1 << 1)) {
+        timer_handler(regs);
+    } else if (irq_pend1 & (1 << AUX_IRQ)) {
+        uart_handler(regs);
+    }
 }

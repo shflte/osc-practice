@@ -251,6 +251,21 @@ char* strcpy(char* dest, const char* src) {
 	return dest;
 }
 
+int atoi(const char* str) {
+    int res = 0;
+
+    while (*str == ' ' || *str == '\t' || *str == '\n' || *str == '\r') {
+        str++;
+    }
+
+    while (*str >= '0' && *str <= '9') {
+        res = res * 10 + (*str - '0');
+        str++;
+    }
+
+    return res;
+}
+
 void* memcpy(void* dest, const void* src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		((char*)dest)[i] = ((const char*)src)[i];

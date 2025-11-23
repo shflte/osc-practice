@@ -14,6 +14,7 @@ int strncmp(const char* a, const char* b, size_t size);
 int strcmp(const char* a, const char* b);
 int strlen(const char* str);
 char* strcpy(char* dest, const char* src);
+int atoi(const char* str);
 
 void* memcpy(void* dest, const void* src, size_t n);
 

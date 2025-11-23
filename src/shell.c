@@ -1,8 +1,10 @@
 #include "shell.h"
 #include "mailbox.h"
 #include "cpio.h"
+#include "timer.h"
 #include "reboot.h"
 #include "utils.h"
+#include "mm.h"
 #include <stddef.h>
 
 typedef struct {
@@ -17,7 +19,7 @@ static void info();
 static void ls();
 static void cat();
 static void user_program();
-static void timer();
+static void set_timeout();
 static void reboot_device();
 
 static const Command command_list[] = {
@@ -27,7 +29,7 @@ static const Command command_list[] = {
 	{"ls", "List files in CPIO archive", ls},
 	{"cat", "Print file content", cat},
 	{"user_program", "Execute user program to test exception handler", user_program},
-	{"timer", "Test timer interrupts", timer},
+	{"set_timeout", "Set timer that print text after specified seconds", set_timeout},
 	{"reboot", "Reboot the device", reboot_device}
 };
 static const int command_count = sizeof(command_list) / sizeof(Command);
@@ -78,12 +80,12 @@ void ls() {
 }
 
 void cat() {
-	char buffer[FILENAME_BUFFER_SIZE];
+	char buffer[INPUT_BUFFER_SIZE];
 	char* file = 0;
 	unsigned int size = 0;
 
 	uart_send_f("Filename: ");
-	uart_getline(buffer, FILENAME_BUFFER_SIZE);
+	uart_getline(buffer, INPUT_BUFFER_SIZE);
 	buffer[strlen(buffer) - 1] = '\0';
 
 	file = cpio_get_file(buffer, &size);
@@ -114,11 +116,35 @@ void user_program() {
     asm volatile("eret");
 }
 
-void timer() {
-	uart_send_f("Press 'q' to exit\n");
-	timer_enable();
-	while (uart_recv() != 'q') { ; }
-	timer_disable();
+typedef struct timer_text {
+	unsigned int seconds;
+	char* text;
+} timer_text_t;
+
+static void print_text(timer_text_t* arg) {
+	uart_send_f("\n%s\n", arg->text);
+	uart_send_f("%d seconds times elapsed\n", (int)arg->seconds);
+}
+
+void set_timeout() {
+	char* text_buffer = mini_malloc(INPUT_BUFFER_SIZE);
+	char* seconds_buffer = mini_malloc(INPUT_BUFFER_SIZE);
+	unsigned int seconds = 0;
+
+	uart_send_f("Text: ");
+	uart_getline(text_buffer, INPUT_BUFFER_SIZE);
+	text_buffer[strlen(text_buffer) - 1] = '\0';
+
+	uart_send_f("Seconds: ");
+	uart_getline(seconds_buffer, INPUT_BUFFER_SIZE);
+	seconds_buffer[strlen(seconds_buffer) - 1] = '\0';
+	seconds = atoi(seconds_buffer);
+
+	timer_text_t* arg = mini_malloc(sizeof(timer_text_t));
+	arg->seconds = seconds;
+	arg->text = text_buffer;
+
+	add_timer((timer_cb_t)print_text, arg, seconds);
 }
 
 void reboot_device()

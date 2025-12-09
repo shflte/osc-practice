@@ -1,7 +1,7 @@
 #ifndef _CPIO_H
 #define _CPIO_H
 
-#define CPIO_BASE 0x20000000u
+#define CPIO_BASE 0x200000u
 
 #include <stdint.h>
 

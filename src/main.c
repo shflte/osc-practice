@@ -4,6 +4,7 @@
 #include "shell.h"
 #include "timer.h"
 #include "irq.h"
+#include "mm.h"
 #include "utils.h"
 
 void kernel_main(void* dtb_base)
@@ -18,6 +19,8 @@ void kernel_main(void* dtb_base)
 
     timer_init();
     enable_cpu_irq();
+
+    buddy_init();
 
     shell();
 }

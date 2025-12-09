@@ -17,7 +17,7 @@ void add_timer(timer_cb_t callback, void* arg, unsigned int expire) {
     asm volatile("mrs %0, cntpct_el0" : "=r"(cntpct));
     asm volatile("mrs %0, cntfrq_el0" : "=r"(freq));
 
-    timer_node_t* new_node = mini_malloc(sizeof(timer_node_t));
+    timer_node_t* new_node = startup_malloc(sizeof(timer_node_t));
     new_node->callback = callback;
     new_node->arg = arg;
     new_node->expire = cntpct + expire * freq;

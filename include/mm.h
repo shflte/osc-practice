@@ -10,17 +10,29 @@
 
 #define LOW_MEMORY				(2 * SECTION_SIZE)
 
-#define SIMPLE_MALLOC_BASE      0x10000000u
-#define SIMPLE_MALLOC_SIZE      (1 * SECTION_SIZE)
-#define SIMPLE_MALLOC_END       (SIMPLE_MALLOC_BASE + SIMPLE_MALLOC_SIZE)
+#define STARTUP_MALLOC_BASE      0x500000UL
+#define STARTUP_MALLOC_SIZE      (1 * SECTION_SIZE)
+#define STARTUP_MALLOC_END       (STARTUP_MALLOC_BASE + STARTUP_MALLOC_SIZE)
+
+#define ALLOC_BEGIN				0x10000000UL
+#define ALLOC_END				0x20000000UL
+#define PAGE_FRAME_NUMBER		((ALLOC_END - ALLOC_BEGIN) / PAGE_SIZE)
+#define PAGE_FRAME_USED			0xAABB00
+#define PAGE_FRAME_CONT			0xCCDD00
+#define PAGE_FRAME_RESV			0xEEFF00
+#define MAX_ORDER				11
 
 #ifndef __ASSEMBLER__
 
 #include <stddef.h>
 
 void memzero(unsigned long src, unsigned long n);
-void* mini_malloc(size_t size);
+
+void* startup_malloc(size_t size);
+
+void buddy_init(void);
+void* page_alloc(unsigned int order);
+void page_free(void* ptr, unsigned int order);
 
 #endif
-
 #endif

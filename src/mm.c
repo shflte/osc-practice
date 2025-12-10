@@ -16,6 +16,7 @@ void* startup_malloc(size_t size) {
 typedef struct page {
 	unsigned int val;
 	struct page* next;
+	int cache_id;
 } page_t;
 static page_t* pages = 0;
 static page_t* free_lists[MAX_ORDER + 1];
@@ -88,4 +89,50 @@ void page_free(void* ptr, unsigned int order) {
 
 	pages[pfn].next = free_lists[cur_order];
 	free_lists[cur_order] = &pages[pfn];
+}
+
+/* DYNAMIC MEMORY ALLOCATOR */
+typedef struct chunk_node {
+	struct chunk_node* next;
+} chunk_node_t;
+static chunk_node_t* caches[MEM_CHUNK_SIZES];
+
+void kmeminit(void) {
+	for (int i = 0; i < MEM_CHUNK_SIZES; i++) {
+		caches[i] = 0;
+	}
+}
+
+void* kalloc(size_t size) {
+	int cache_id = 0;
+	if (size > MEM_CHUNK_MIN) {
+		cache_id = (32 - __builtin_clz(size - 1)) - (32 - __builtin_clz(MEM_CHUNK_MIN) - 1);
+	}
+
+	if (!caches[cache_id]) {
+		caches[cache_id] = page_alloc(0);
+
+		unsigned int pfn = ((unsigned long)(caches[cache_id]) - ALLOC_BEGIN) / PAGE_SIZE;
+		pages[pfn].cache_id = cache_id;
+
+		int chunk_size = MEM_CHUNK_MIN << cache_id;
+		int chunk_count = PAGE_SIZE / chunk_size;
+		chunk_node_t* tmp = caches[cache_id];
+		for (int i = 1; i < chunk_count; i++) {
+			tmp->next = (char*)(caches[cache_id]) + chunk_size * i;
+			tmp = tmp->next;
+		}
+		tmp->next = 0;
+	}
+
+	void* res_ptr = caches[cache_id];
+	caches[cache_id] = caches[cache_id]->next;
+	return res_ptr;
+}
+
+void kfree(void* ptr) {
+	unsigned int pfn = ((unsigned long)(ptr) - ALLOC_BEGIN) / PAGE_SIZE;
+	int cache_id = pages[pfn].cache_id;
+	((chunk_node_t*)ptr)->next = caches[cache_id];
+	caches[cache_id] = (chunk_node_t*)ptr;
 }

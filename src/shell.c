@@ -124,11 +124,13 @@ typedef struct timer_text {
 static void print_text(timer_text_t* arg) {
 	uart_send_f("\n%s\n", arg->text);
 	uart_send_f("%d seconds times elapsed\n", (int)arg->seconds);
+	kfree(arg->text);
+	kfree(arg);
 }
 
 void set_timeout() {
-	char* text_buffer = startup_malloc(INPUT_BUFFER_SIZE);
-	char* seconds_buffer = startup_malloc(INPUT_BUFFER_SIZE);
+	char* text_buffer = kalloc(INPUT_BUFFER_SIZE);
+	char* seconds_buffer = kalloc(INPUT_BUFFER_SIZE);
 	unsigned int seconds = 0;
 
 	uart_send_f("Text: ");
@@ -140,7 +142,9 @@ void set_timeout() {
 	seconds_buffer[strlen(seconds_buffer) - 1] = '\0';
 	seconds = atoi(seconds_buffer);
 
-	timer_text_t* arg = startup_malloc(sizeof(timer_text_t));
+	kfree(seconds_buffer);
+
+	timer_text_t* arg = kalloc(sizeof(timer_text_t));
 	arg->seconds = seconds;
 	arg->text = text_buffer;
 

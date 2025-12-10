@@ -22,6 +22,9 @@
 #define PAGE_FRAME_RESV			0xEEFF00
 #define MAX_ORDER				11
 
+#define MEM_CHUNK_MIN			16
+#define MEM_CHUNK_SIZES			8
+
 #ifndef __ASSEMBLER__
 
 #include <stddef.h>
@@ -33,6 +36,10 @@ void* startup_malloc(size_t size);
 void buddy_init(void);
 void* page_alloc(unsigned int order);
 void page_free(void* ptr, unsigned int order);
+
+void kmeminit(void);
+void* kalloc(size_t size);
+void kfree(void* ptr);
 
 #endif
 #endif

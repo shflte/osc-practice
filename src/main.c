@@ -21,6 +21,7 @@ void kernel_main(void* dtb_base)
     enable_cpu_irq();
 
     buddy_init();
+    kmeminit();
 
     shell();
 }
